@@ -164,32 +164,25 @@ STRUCTURED INFO: {structured_info}`;
 async function generatePdf(html: string): Promise<Buffer> {
   let browser;
   try {
-    const isLocal = process.env.NODE_ENV === 'development';
-    
-    const options: any = {
-      headless: true,
+    // Configure for Vercel serverless environment
+    const options = {
+      args: chromium.args,
+      defaultViewport: chromium.defaultViewport,
+      executablePath: await chromium.executablePath(),
+      headless: chromium.headless,
     };
-    
-    if (isLocal) {
-      // For local development, use the installed Chrome
-      options.args = puppeteerCore.defaultArgs();
-      options.executablePath = process.env.CHROME_EXECUTABLE_PATH || 
-                              (process.platform === 'darwin' 
-                                ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
-                                : process.platform === 'win32'
-                                  ? 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe'
-                                  : '/usr/bin/google-chrome');
-    } else {
-      // For production (Vercel), use chromium-min
-      options.args = chromium.args;
-      options.defaultViewport = chromium.defaultViewport;
-      options.executablePath = await chromium.executablePath();
-    }
-    
-    browser = await puppeteerCore.launch(options);
-    const page = await browser.newPage();
-    await page.setContent(html, { waitUntil: "networkidle0" });
 
+    // Launch the browser
+    browser = await puppeteerCore.launch(options as any);
+    const page = await browser.newPage();
+    
+    // Set content with a longer timeout for serverless environments
+    await page.setContent(html, { 
+      waitUntil: "networkidle0",
+      timeout: 30000 // Increase timeout to 30 seconds
+    });
+
+    // Generate PDF
     const pdfBuffer = await page.pdf({
       format: "A4",
       margin: {
