@@ -164,16 +164,21 @@ STRUCTURED INFO: {structured_info}`;
 async function generatePdf(html: string): Promise<Buffer> {
   let browser;
   try {
-    // Configure for Vercel serverless environment
+    // Configure chromium
+    chromium.setHeadlessMode = true;
+    chromium.setGraphicsMode = false;
+    
+    // Configure browser options specifically for Vercel serverless
     const options = {
-      args: chromium.args,
+      args: [...chromium.args, "--hide-scrollbars", "--disable-web-security"],
       defaultViewport: chromium.defaultViewport,
-      executablePath: await chromium.executablePath(),
-      headless: chromium.headless,
+      executablePath: await chromium.executablePath("/tmp"),
+      headless: "new",
+      ignoreHTTPSErrors: true,
     };
 
     // Launch the browser
-    browser = await puppeteerCore.launch(options as any);
+    browser = await puppeteerCore.launch(options);
     const page = await browser.newPage();
     
     // Set content with a longer timeout for serverless environments
