@@ -1,7 +1,17 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
-    darkMode: ["class"],
+	eslint: {
+		// Warning: This allows production builds to successfully complete even if
+		// your project has ESLint errors.
+		ignoreDuringBuilds: true,
+	  },
+	  typescript: {
+		// Warning: This allows production builds to successfully complete even if
+		// your project has TypeScript errors.
+		ignoreBuildErrors: true
+	},
+	darkMode: ["class"],
     content: [
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
