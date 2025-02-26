@@ -178,7 +178,7 @@ async function generatePdf(html: string): Promise<Buffer> {
     };
 
     // Launch the browser
-    browser = await puppeteerCore.launch(options);
+    browser = await puppeteerCore.launch(options as any);
     const page = await browser.newPage();
     
     // Set content with a longer timeout for serverless environments
