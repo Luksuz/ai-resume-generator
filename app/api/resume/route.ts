@@ -161,60 +161,55 @@ STRUCTURED INFO: {structured_info}`;
 }
 
 // Function to convert HTML to PDF using Puppeteer
-// Function to convert HTML to PDF using Puppeteer
 async function generatePdf(html: string): Promise<Buffer> {
-    let browser;
-    try {
-      // Configure chromium with explicit installation path
-      const executablePath = await chromium.executablePath("/tmp/chromium");
-      
-      // Configure browser options specifically for Vercel serverless
-      const options = {
-        args: [
-          ...chromium.args,
-          "--hide-scrollbars",
-          "--disable-web-security",
-          "--no-sandbox",
-          "--disable-setuid-sandbox"
-        ],
-        defaultViewport: chromium.defaultViewport,
-        executablePath,
-        headless: chromium.headless,
-        ignoreHTTPSErrors: true,
-      };
+  let browser = null;
   
-      // Launch the browser
-      browser = await puppeteerCore.launch(options as any);
-      const page = await browser.newPage();
-      
-      // Set content with a longer timeout for serverless environments
-      await page.setContent(html, { 
-        waitUntil: "networkidle0",
-        timeout: 30000 // Increase timeout to 30 seconds
-      });
-  
-      // Generate PDF
-      const pdfBuffer = await page.pdf({
-        format: "A4",
-        margin: {
-          top: "0.5in",
-          right: "0.5in",
-          bottom: "0.5in",
-          left: "0.5in",
-        },
-        printBackground: true,
-      });
-  
-      return Buffer.from(pdfBuffer);
-    } catch (error) {
-      console.error("Error generating PDF:", error);
-      throw error;
-    } finally {
-      if (browser) {
-        await browser.close();
-      }
+  try {
+    // Configure chromium
+    chromium.setHeadlessMode = true;
+    chromium.setGraphicsMode = false;
+    
+    // Configure browser options specifically for Vercel serverless
+    const options = {
+      args: [...chromium.args, "--hide-scrollbars", "--disable-web-security", "--no-sandbox", "--disable-setuid-sandbox"],
+      defaultViewport: chromium.defaultViewport,
+      executablePath: await chromium.executablePath(),
+      headless: chromium.headless,
+      ignoreHTTPSErrors: true,
+    };
+
+    // Launch the browser
+    browser = await puppeteerCore.launch(options as any);
+    const page = await browser.newPage();
+    
+    // Set content with a longer timeout for serverless environments
+    await page.setContent(html, { 
+      waitUntil: "networkidle0",
+      timeout: 30000 // Increase timeout to 30 seconds
+    });
+
+    // Generate PDF
+    const pdfBuffer = await page.pdf({
+      format: "A4",
+      margin: {
+        top: "0.5in",
+        right: "0.5in",
+        bottom: "0.5in",
+        left: "0.5in",
+      },
+      printBackground: true,
+    });
+
+    return Buffer.from(pdfBuffer);
+  } catch (error) {
+    console.error("Error generating PDF:", error);
+    throw error;
+  } finally {
+    if (browser !== null) {
+      await browser.close();
     }
   }
+}
 
 export async function POST(request: NextRequest) {
   try {
