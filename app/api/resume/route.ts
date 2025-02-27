@@ -117,12 +117,19 @@ async function generatePdf(html: string): Promise<Buffer> {
     executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
         args: [
           "--no-sandbox",
+          "--disable-setuid-sandbox",
+          "--disable-dev-shm-usage",
+          "--disable-gpu"
         ],
     headless: true,
+    timeout: 60000 // Increase Puppeteer's timeout to 60 seconds
+
   });
   
   const page = await browser.newPage();
-  await page.setContent(html, { waitUntil: "networkidle0" });
+  await page.setContent(html, { waitUntil: "networkidle0", timeout: 60000 });
+  page.setDefaultTimeout(60000); // 60 seconds for all other operations
+
   
   const pdfBuffer = await page.pdf({
     format: "a4",
@@ -132,7 +139,9 @@ async function generatePdf(html: string): Promise<Buffer> {
       bottom: "0.5in",
       left: "0.5in"
     },
-    printBackground: true
+    printBackground: true,
+    timeout: 60000 // 60 seconds
+
   });
   
   await browser.close();
