@@ -111,6 +111,7 @@ async function generateResumeHtml(structuredInfo: string) {
 
 // Function to convert HTML to PDF using Puppeteer
 async function generatePdf(html: string): Promise<Buffer> {
+    console.log(process.env.PUPPETEER_EXECUTABLE_PATH);
   const browser = await puppeteer.launch({
     executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
         args: [
