@@ -91,7 +91,7 @@ async function generateResumeHtml(structuredInfo: string) {
 
   // Create the model
   const model = new ChatOpenAI({
-    modelName: "gpt-4o",
+    modelName: "gpt-4o-mini",
     temperature: 0.2,
   });
 
