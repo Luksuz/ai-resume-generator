@@ -56,9 +56,10 @@ async function structureUserInfo(rawUserInfo: string, customInput?: string) {
       You will need to extract the name, age, location, interests, work experience, education and resume style notes.
       Resume style notes will be used in generating the resume in html format. Extract the possible industry and based on that, extract the style.
       
-      ${customInput ? "ADDITIONAL INFORMATION: " + customInput : ""}
     `],
-    ["human", `USER INFO: ${rawUserInfo}`]
+    ["human", `USER INFO: ${rawUserInfo}
+    ${customInput ? "ADDITIONAL INFORMATION(User prompt/request): " + customInput : ""}
+`]
   ]);
 
   // Create the model with structured output
