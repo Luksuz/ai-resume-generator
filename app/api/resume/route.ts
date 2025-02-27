@@ -112,6 +112,10 @@ async function generateResumeHtml(structuredInfo: string) {
 // Function to convert HTML to PDF using Puppeteer
 async function generatePdf(html: string): Promise<Buffer> {
   const browser = await puppeteer.launch({
+    executablePath: process.env.PUPPETEER_EXECUTABLE_PATH,
+        args: [
+          "--no-sandbox",
+        ],
     headless: true,
   });
   
@@ -119,7 +123,7 @@ async function generatePdf(html: string): Promise<Buffer> {
   await page.setContent(html, { waitUntil: "networkidle0" });
   
   const pdfBuffer = await page.pdf({
-    format: "A4",
+    format: "a4",
     margin: {
       top: "0.5in",
       right: "0.5in",
